@@ -9,8 +9,12 @@
 import SwiftUI
 
 struct ContentView: View {
+    let people = ["Finn", "Leia", "Luke", "Rey"]
+    
     var body: some View {
-        Text("Hello, World!")
+        List(people, id: \.self) {
+            Text("Dynamic row \($0)")
+        }
     }
 }
 
