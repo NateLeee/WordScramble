@@ -17,6 +17,7 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 TextField("Title", text: $newWord, onCommit: addNewWord)
+                    .autocapitalization(.none)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 
@@ -26,12 +27,32 @@ struct ContentView: View {
                 }
             }
             .navigationBarTitle(Text(rootWord))
+            .onAppear(perform: startGame)
+        }
+    }
+    
+    func startGame() {
+        // Read from bundle
+        let fileUrl = Bundle.main.url(forResource: "start", withExtension: "txt")!
+        do {
+            let str = try String(contentsOf: fileUrl)
+            let start = str.components(separatedBy: "\n").randomElement()!
+            rootWord = start
+            
+        } catch {
+            fatalError("Couldn't read the start.txt file!")
         }
     }
     
     func addNewWord() {
-        let trimmed = newWord.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard trimmed.count > 0 else {
+            return
+        }
+        
         usedWords.insert(trimmed, at: 0)
+        newWord = ""
     }
 }
 
