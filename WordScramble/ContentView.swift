@@ -99,6 +99,16 @@ struct ContentView: View {
     }
     
     func isReal(word: String) -> Bool {
+        // Challenge I - 1: - Disallow answers that are shorter than three letters
+        guard word.count >= 3 else {
+            return false
+        }
+        
+        // Challenge I - 2: - Disallow answers that are just our start word
+        guard word != rootWord else {
+            return false
+        }
+        
         let checker = UITextChecker()
         let range = NSRange(location: 0, length: word.utf16.count)
         let mispelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
