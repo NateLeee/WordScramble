@@ -13,6 +13,11 @@ struct ContentView: View {
     @State private var rootWord = "rootWord"
     @State private var newWord = ""
     
+    // MARK: - Alert Related Properties
+    @State private var errorTitle = ""
+    @State private var errorMessage = ""
+    @State private var showingError = false
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -28,6 +33,9 @@ struct ContentView: View {
             }
             .navigationBarTitle(Text(rootWord))
             .onAppear(perform: startGame)
+            .alert(isPresented: $showingError) { () -> Alert in
+                Alert(title: Text(errorTitle), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+            }
         }
     }
     
@@ -36,7 +44,7 @@ struct ContentView: View {
         let fileUrl = Bundle.main.url(forResource: "start", withExtension: "txt")!
         do {
             let str = try String(contentsOf: fileUrl)
-            let start = str.components(separatedBy: "\n").randomElement()!
+            let start = str.components(separatedBy: "\n").randomElement() ?? "silkworm"
             rootWord = start
             
         } catch {
@@ -51,9 +59,59 @@ struct ContentView: View {
             return
         }
         
+        // DONE: - Guard more things
+        guard isOriginal(word: trimmed) else {
+            wordError(title: "Word used already", message: "Be more original")
+            return
+        }
+        
+        guard isPossible(word: trimmed) else {
+            wordError(title: "Word not recognized", message: "You can't just make them up, you know!")
+            return
+        }
+        
+        guard isReal(word: trimmed) else {
+            wordError(title: "Word not possible", message: "That isn't even a real word!")
+            return
+        }
+        
         usedWords.insert(trimmed, at: 0)
         newWord = ""
     }
+    
+    func isOriginal(word: String) -> Bool {
+        !usedWords.contains(word)
+    }
+    
+    // rootWord = "abc",
+    func isPossible(word: String) -> Bool {
+        var tmpWord = rootWord
+        
+        for letter in word {
+            if let pos = tmpWord.firstIndex(of: letter) {
+                tmpWord.remove(at: pos)
+            } else { // not found
+                return false
+            }
+        }
+        
+        return true
+    }
+    
+    func isReal(word: String) -> Bool {
+        let checker = UITextChecker()
+        let range = NSRange(location: 0, length: word.utf16.count)
+        let mispelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
+        
+        return mispelledRange.location == NSNotFound
+    }
+    
+    func wordError(title: String, message: String) {
+        errorTitle = title
+        errorMessage = message
+        showingError = true
+    }
+    
 }
 
 struct ContentView_Previews: PreviewProvider {
