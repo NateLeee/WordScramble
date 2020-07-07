@@ -32,14 +32,21 @@ struct ContentView: View {
                 }
             }
             .navigationBarTitle(Text(rootWord))
-            .onAppear(perform: startGame)
-            .alert(isPresented: $showingError) { () -> Alert in
-                Alert(title: Text(errorTitle), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+            .navigationBarItems(leading: Button(action: {
+                self.startGame()
+            }, label: {Text("Restart")}) )
+                .onAppear(perform: startGame)
+                .alert(isPresented: $showingError) { () -> Alert in
+                    Alert(title: Text(errorTitle), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
         }
     }
     
     func startGame() {
+        // Restart
+        usedWords.removeAll()
+        newWord = ""
+        
         // Read from bundle
         let fileUrl = Bundle.main.url(forResource: "start", withExtension: "txt")!
         do {
