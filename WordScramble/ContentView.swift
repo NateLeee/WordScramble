@@ -13,6 +13,8 @@ struct ContentView: View {
     @State private var rootWord = "rootWord"
     @State private var newWord = ""
     
+    @State private var score = 0
+    
     // MARK: - Alert Related Properties
     @State private var errorTitle = ""
     @State private var errorMessage = ""
@@ -30,6 +32,13 @@ struct ContentView: View {
                     Image(systemName: "\($0.count).circle.fill")
                     Text("\($0)")
                 }
+                .frame(height: 200)
+                
+                Form {
+                    Section(header: Text("Score")) {
+                        Text("\(score)")
+                    }
+                }
             }
             .navigationBarTitle(Text(rootWord))
             .navigationBarItems(leading: Button(action: {
@@ -46,6 +55,7 @@ struct ContentView: View {
         // Restart
         usedWords.removeAll()
         newWord = ""
+        score = 0
         
         // Read from bundle
         let fileUrl = Bundle.main.url(forResource: "start", withExtension: "txt")!
@@ -83,6 +93,10 @@ struct ContentView: View {
         }
         
         usedWords.insert(trimmed, at: 0)
+        
+        // Score
+        score += trimmed.count
+        
         newWord = ""
     }
     
