@@ -28,9 +28,13 @@ struct ContentView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 
-                List(usedWords, id:\.self) {
-                    Image(systemName: "\($0.count).circle.fill")
-                    Text("\($0)")
+                List(usedWords, id:\.self) { word in
+                    HStack {
+                        Image(systemName: "\(word.count).circle.fill")
+                        Text("\(word)")
+                    }
+                    .accessibilityElement(children: .ignore)
+                    .accessibility(label: Text("\(word), \(word.count) letters."))
                 }
                 .frame(height: 200)
                 
